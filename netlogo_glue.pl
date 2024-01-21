@@ -8,7 +8,7 @@ log(crossing, Self, CarType, LightNum) :-
     (
         (
             color(LightNum, red),
-            swritef(Message, '%w %w crossed with %w light %w', [CarType, Self, red]),
+            swritef(Message, '%w %w crossed with %w light.', [CarType, Self, red]),
             print_message(warning, Message)
         )
         ;   true
@@ -17,6 +17,10 @@ log(crossing, Self, CarType, LightNum) :-
 log(give_way, Self, CarType, X, LightNum) :-
     color(LightNum, Light),
     swritef(Message, '%w %w has given way to %w at a %w light.', [CarType, Self, X, Light]),
+    print_message(warning, Message).
+
+log(stop, Self, CarType, X) :-
+    swritef(Message, '%w %w has given way to %w at a stop sign.', [CarType, Self, X]),
     print_message(warning, Message).
 
 log(yellow, Self, CarType, LightNum, X, Y) :-

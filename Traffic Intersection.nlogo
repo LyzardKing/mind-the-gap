@@ -2,6 +2,7 @@ extensions[netprologo]
 
 globals [
   ticks-at-last-change  ; value of the tick counter the last time a light changed
+  total_accidents
 ]
 
 breed [ lights light ]
@@ -59,13 +60,18 @@ to setup
      (abs pycor < 2 and abs pxcor = 3) [
       set pcolor grey
     ]
+    if (abs pxcor <= 1 and abs pycor <= 1) or (pxcor > 10 and pxcor <= 13 and abs pycor <= 1) [
+      set pcolor pink
+    ]
   ]
-  ask patch 0 -4 [ sprout-lights 1 [ set color green ] ]
-  ask patch -4 0 [ sprout-lights 1 [ set color red ] ]
-  ; Add opposite lights
-  ;ask patch 0 4 [ sprout-lights 1 [ set color green ] ]
-  ;ask patch 4 0 [ sprout-lights 1 [ set color red ] ]
-  ask patch 12 -2 [ sprout-signs  1 [ set color red set spec "stop" ] ]
+  ; add lights
+  ask patch 1 -4 [ sprout-lights 1 [ set color green ] ]
+  ask patch -4 -1 [ sprout-lights 1 [ set color red ] ]
+  ask patch -1 4 [ sprout-lights 1 [ set color green ] ]
+  ask patch 4 1 [ sprout-lights 1 [ set color red ] ]
+  ; add stop signs
+  ask patch 13 -2 [ sprout-signs  1 [ set color red set spec "stop" ] ]
+  ask patch 11 2 [ sprout-signs  1 [ set color red set spec "stop" ] ]
   reset-ticks
 end
 
@@ -78,9 +84,14 @@ to go
   ask pedestrians [ move ]
   ask ambulances [ move ]
   check-for-collisions
-  make-new-car freq-north 0 min-pycor 0
-  make-new-car freq-east min-pxcor 0 90
-  make-new-car freq-north 12 min-pycor 0
+  make-new-car freq-north 1 min-pycor 0
+  make-new-car freq-north -1 max-pycor 180
+
+  make-new-car freq-east min-pxcor -1 90
+  make-new-car freq-east max-pxcor 1 -90
+
+  make-new-car freq-north 13 min-pycor 0
+  make-new-car freq-north 11 max-pycor 180
   ; make pedestrians
   make-new-pedestrian freq-east * 30 -3 min-pycor 0
   make-new-pedestrian freq-east * 30 min-pxcor -3 90
@@ -98,7 +109,7 @@ to go
 end
 
 to make-new-pedestrian [freq x y h]
-  ;let min-speed max (list (speed - max-brake) 0)
+  ;let min-speed max (list (speed - sbrake) 0)
   ; Randomize crossing (before or after intersection)
   ; Enable only if prolog rule has position of self and neighbors
 ;  if (random 100 < 50) [
@@ -108,9 +119,13 @@ to make-new-pedestrian [freq x y h]
 ;      set y 3
 ;    ]
 ;  ]
-  if (random 100 < 1) and not any? turtles-on patch x y [
+  if (random 100 < 5) and not any? turtles-on patch x y [
     create-pedestrians 1 [
+     ; to use the random function the rules have to be expanded.
+     ; at the moment the "give_way" prolog method is called only
+     ; in proximity of a junction.
      setxy x y
+     ; setxy random-pxcor random-pycor
      set heading h
      set color red
      set speed 1
@@ -134,7 +149,7 @@ to make-new-car [ freq x y h ]
       ]
     ] [
       let b "good"
-      if random 100 < 5 [
+      if random 100 < 20 [
         set b "bad"
       ]
       create-cars 1 [
@@ -150,14 +165,27 @@ to make-new-car [ freq x y h ]
 end
 
 to move ; turtle procedure
-  if shape = "car" and xcor > 0 and ycor > 0 [
-    let self_heading [heading] of turtle who
-    let ambulance_behind count (cars-on patch-at-heading-and-distance self_heading -1) with [shape = "ambulance"]
-    show ambulance_behind
+  ; Some cars will turn at the intersection.
+  ; The system should not break in this case.
+  if (xcor > min-pxcor and ycor > min-pycor and xcor < max-pxcor and ycor < max-pycor) [
+    let front_color [pcolor] of patch-at-heading-and-distance heading 1
+    let past_color [pcolor] of patch-at-heading-and-distance heading -1
+    if  (past_color != front_color) and in-intersection? [
+      if (front_color = pink) [
+        if random 100 < 90 [
+          set heading heading + 90
+        ]
+      ]
+      if (front_color = black) [
+        if random 100 < 90 [
+          set heading heading - 90
+        ]
+      ]
+    ]
   ]
   adjust-speed
   repeat speed [ ; move ahead the correct amount
-    fd 1
+    fd 1 ;/ 10
     if not can-move? 1 [ die ] ; die when I reach the end of the world
     if any? accidents-here [
       ; if I hit an accident, I cause another one
@@ -165,17 +193,13 @@ to move ; turtle procedure
       die
     ]
   ]
-  ; Some cars will turn at the intersection.
-  ; The system should not break in this case.
-  if (xcor = 0) and (ycor = 0) [
-    if random 100 < 40 [
-      ifelse heading = 0 [
-        set heading 90
-      ] [
-        set heading 0
-      ]
-    ]
-  ]
+;  fd speed
+;  if not can-move? 1 [ die ] ; die when I reach the end of the world
+;    if any? accidents-here [
+;      ; if I hit an accident, I cause another one
+;      ask accidents-here [ set clear-in 5 ]
+;      die
+;    ]
 end
 
 to adjust-speed
@@ -185,7 +209,7 @@ to adjust-speed
 
   let target-speed max-speed ; aim to go as fast as possible
   if shape = "person" [
-    set target-speed 1
+    set target-speed 1 ; / 10
   ]
   ;let target-speed min-speed + (random-float (max-speed - min-speed))
 
@@ -229,7 +253,7 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   let target_patch_y [pycor] of target-patch
   let self_shape [shape] of turtle who
   let self_heading [heading] of turtle who
-  let other_turtles (other turtles in-cone 8 90) with [heading != self_heading]
+  let other_turtles (other turtles in-cone 10 120) with [heading != self_heading]
   ; let self_behaviour ([behaviour] of turtle who)
   let self_distance (distance target-patch)
   let self_speed ([speed] of turtle who)
@@ -240,18 +264,32 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   any? other cars-on target-patch or (self_shape != "person" and any? other pedestrians-on target-patch) or
   ;(self_shape != "person" and (any? (other turtles-on target-patch) with [shape != "square"]))or
     any? accidents-on target-patch or
-  ; replaced ; in-radius 6 with in-cone 6 180
+    ; replaced ; in-radius 6 with in-cone 6 180
   (any? (lights-on target-patch) and self_shape != "person" and
     ; ([behaviour] of turtle who = "good") and
     netprologo:run-query(netprologo:build-prolog-call "not_enter_junction(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)" who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) xcor ycor)
   ) or
   (any? (signs-on target-patch) and self_shape != "person" and
     netprologo:run-query(netprologo:build-prolog-call "not_enter_junction(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)" who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) xcor ycor)
-  )
+  ); or
+  ;( self_shape != "person" and
+  ;  netprologo:run-query(netprologo:build-prolog-call "give_way(?1, ?2, ?3, ?4)" who ([behaviour] of turtle who) ([shape] of other_turtles) "_")
+  ;)
+end
+
+; TODO: write with prolog link
+; to-report can-overtake
+
+to-report make-way?
+  let self_heading [heading] of turtle who
+  ; let self_back self_heading - 180
+  ; let ambulance_behind count (ambulances-on patch-at-heading-and-distance self_back 1)
+  let ambulance_behind count (cars-on patch-at-heading-and-distance self_heading -1) with [shape = "ambulance"]
+  report ambulance_behind > 0
 end
 
 to-report in-intersection?
-
+  report pcolor = pink ; Determine if in intersection by looking at the patch color
 end
 
 to check-for-collisions
@@ -266,6 +304,7 @@ to check-for-collisions
       set clear-in 5
     ]
     ask cars-here [ die ]
+    set total_accidents total_accidents + 1
   ]
 end
 
@@ -277,9 +316,14 @@ to change-to-yellow
 end
 
 to change-to-red
+  let red_lights lights with [ color = red ]
   ask lights with [ color = yellow ] [
     set color red
-    ask other lights [ set color green ]
+    ;ask other lights with [ color = red ] [ set color green ]
+    set ticks-at-last-change ticks
+  ]
+  ask red_lights [
+    set color green
     set ticks-at-last-change ticks
   ]
 end
@@ -407,7 +451,7 @@ speed-limit
 speed-limit
 1
 10
-6.0
+4.0
 1
 1
 NIL
@@ -602,6 +646,17 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+915
+370
+1017
+415
+NIL
+total_accidents
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

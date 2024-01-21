@@ -58,9 +58,9 @@ not_enter_junction(Self, Behaviour, Distance, Speed, [], [Sign], CarType, Neighb
 % Emergency vehicles can enter the intersection even if the light is red.
 enter_junction(Self, Light, CarType, Neighbours, X, Y) :-
     emergency_vehicle(CarType),
-    \+ give_way(Self, CarType, Neighbours, Light),
+    \+ give_way(Self, CarType, Neighbours, Light).
     % add_violation(Self, CarType, crossed_with_red_light).
-    log(crossing, Self, CarType, Light).
+    % log(crossing, Self, CarType, Light).
 
 % Normal cars can enter the intersection if they do not have to give way to other agents.
 enter_junction(Self, Light, CarType, Neighbours, X, Y) :-
@@ -70,9 +70,13 @@ enter_junction(Self, Light, CarType, Neighbours, X, Y) :-
 enter_junction(Self, Light, CarType, Neighbours, X, Y) :-
     color(Light, yellow),
     in_intersection(X, Y),
-    \+ give_way(Self, CarType, Neighbours, Light),
-    log(yellow, Self, CarType, Light, X, Y).
+    \+ give_way(Self, CarType, Neighbours, Light).
+    % log(yellow, Self, CarType, Light, X, Y).
     % add_violation(Self, CarType, crossed_with_red_light).
+
+enter_junction(Self, Light, CarType, Neighbours, X, Y) :-
+    member(x, Neighbours),
+    \+ give_way(Self, stop, CarType, Neighbours).
 
 % Rule 171
 % You MUST stop behind the line at a junction with a 'Stop' sign and a solid
@@ -103,14 +107,20 @@ stop_sign(Sign) :-
 
 % Is this rule 219?
 give_way(Self, CarType, Neighbours, Light) :-
-    emergency_vehicle(Neighbours),
-    log(give_way, Self, CarType, emergency_vehicle, Light).
+    emergency_vehicle(Neighbours).
+    % log(give_way, Self, CarType, emergency_vehicle, Light).
 
 % Rule 170.2
 % give way to pedestrians crossing or waiting to cross a road into which or
 % from which you are turning. If they have started to cross they have priority,
 % so give way (see Rule H2)
 give_way(Self, CarType, Neighbours, Light) :-
-    pedestrian(Neighbours),
-    log(give_way, Self, CarType, pedestrian, Light).
+    pedestrian(Neighbours).
+    % log(give_way, Self, CarType, pedestrian, Light).
 
+give_way(Self, stop, CarType, Neighbours) :-
+    length(Neighbours, Y),
+    log(stop, Self, CarType, Neighbours),
+    Y > 1.
+
+% TODO: add overtaking rule
