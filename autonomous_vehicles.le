@@ -1,0 +1,130 @@
+the target language is: prolog. % other languages available soon
+% Logical English document
+% above example of a prolog module name. Please adjust as convenient. 
+% comments only after the en( 
+
+the templates are:
+*a vehicle* has the obligation that *an eventuality*.
+*a vehicle* has the prohibition that *an eventuality*.
+*a vehicle* can enter *an intersection*.
+*a vehicle* enters *an intersection*.
+*a vehicle* can enter *an intersection* at *a time*.
+*a vehicle* stops at *an intersection* at *a time*.
+there is a safe gap for *a vehicle* at *an intersection*.
+there is an unsafe gap for *a vehicle* at *an intersection*.
+*a vehicle* has a *a sign* sign at *an intersection*.
+*a vehicle* has watched *a intersection* before *a time*.
+*a vehicle* has entered *an intersection*.
+there are users crossing *a intersection* at *a time*.
+*a vehicle* slows at *an intersection*.
+there is a road user waiting to cross *an intersection*.
+there is a road user close to *a vehicle*.
+there is a long vehicle in *an intersection*.
+*a vehicle* approaches *an intersection* at *a time*.
+*a vehicle* has to leave on *a direction*.
+
+*a vehicle* can start *an action*.
+*a vehicle* overtakes *a vehicle*
+*a vehicle* respects the obligation that *an eventuality*.
+*a vehicle* has the permission that *an eventuality*.
+
+the knowledge base autonomous_vehicle includes:
+
+% TODO: use the eventuality in place of the full statement?
+% Is this enough to represent multiple deontic modalities?
+
+a vehicle respects the obligation that an eventuality
+if the vehicle has the obligation that an eventuality
+and it is the case that
+    the eventuality.
+
+% Rule 159
+
+a vehicle can start moving if
+the vehicle respects the obligation that 
+    the vehicle signals.
+% Rule 160
+
+a vehicle has the obligation that 
+    the vehicle stays on the left
+and it is not the case that
+    the vehicle has the permission that
+        the vehicle stays on the left.
+
+% Rule 162 (Overtaking)
+
+a vehicle has the permission that the vehicle overtakess a road user
+if there is a safe gap for the vehicle at the other vehice
+and it is not the case that
+    a third road user overtakes the vehicle.
+
+a vehicle can enter an intersection at a time if
+the vehicle has watched the intersection before the time
+and it is not the case that
+    there are users crossing the intersection at the time
+and there is a safe gap for the vehicle in the intersection at the time.
+
+a vehicle has the obligation that 
+    the vehicle slows at an intersection
+if there is a road user close to the vehicle
+    or there is a road user waiting to cross the intersection
+    or there is a long vehicle in the intersection.
+
+% Rule 171
+a vehicle has the obligation that
+    the vehicle stops at an intersection at a time
+    if the vehicle has a stop sign at the intersection
+    and the vehicle approaches the intersection at the time.
+
+% Rule 172
+a vehicle has the obligation that
+    the vehicle stops at an intersection at a time
+if the vehicle has a give way sign at the intersection
+and the vehicle approaches the intersection at the time.
+
+%% Is the broken white line the same as the give way sign?
+
+%Rule 173
+% are dual carriageways already considered by the example we have? if not we should add another rule
+
+a vehicle can enter a second carriage of an intersection at a time
+if the vehicle has entered the the intersection
+and the vehicle can enter the second carriage of the intersection at the time.
+
+%Rule 174
+a vehicle can enter a box junction
+if it is not the case that
+    the vehicle has the prohibition that
+        the vehicle enters the box junction.
+
+a vehicle has the prohibition that
+    the vehicle enters the intersection
+if the vehicle has to leave on an exit road
+and it is not the case that
+    the exit road is the right
+    or the exit road is clear.
+
+
+a vehicle can enter an intersection at a time T2
+if the vehicle has the obligation that 
+    the vehicle stops at the intersection at a time T1
+and the vehicle stops at the intersection at T1
+and the vehicle can enter the intersection at the time T2
+and T1 is before T2.
+
+scenario stop is:
+red car approaches intersection 1 at 1.
+red car has a stop sign at intersection 1.
+red car stops at intersection 1 at 1.
+red car has watched intersection 1 before 2.
+there is a safe gap for red car in intersection 1 at 2.
+
+% add as many as you need    
+query one is:
+which vehicle has the obligation that which eventuality.
+    
+query two is:
+which vehicle can enter which intersection at which time.
+
+query three is:
+which vehice respects the obligation that which eventuality.

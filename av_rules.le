@@ -1,0 +1,107 @@
+the target language is: prolog.
+
+the templates are:
+*a vehicle* has the permission that *an eventuality*.
+*a vehicle* can enter *an intersection* at *a time*.
+*a vehicle* enters *an intersection* at *a time*.
+*a vehicle* stops at *an intersection* at *a time*.
+*a vehicle* slows down at *an intersection* at *a time*.
+there is a safe gap for *a vehicle* at *an intersection* at *a time*.
+*an agent* is close to *a vehicle* at *an intersection*.
+*an agent* is waiting to cross *an intersection*.
+*an agent* is in *an intersection*.
+*an agent* is of type *a class*.
+*a vehicle* respected the rules of *an intersection* at *a time*.
+*an intersection* displays *a sign*.
+there is a gap for *a vehicle* at *an intersection* of * a distance* at *a time*.
+the safe gap at *an intersection* is of *a distance*.
+the safe gap at *an intersection* at *a time* is of *a distance*.
+the safe gap modifiers at *an intersection* at *a time* amount to *a number*.
+*a vehicle* can violate the rules of *an intersection* at *a time*.
+*a vehicle* is of type *a type*.
+
+% Intentions
+*a vehicle* needs to enter *an intersection* at *a time*.
+*a vehicle* should give way to *a vehicle* at *an intersection* at *a time*.
+
+the knowledge base av_rules includes:
+
+a vehicle has the permission that the vehicle enters an intersection at a time T1 if
+the vehicle respected the rules of the intersection at a time T2
+and there is a safe gap for the vehicle at the intersection at T1
+and T2 is before T1
+and it is not the case that
+    the vehicle should give way to another road user at the intersection at T1.
+
+a vehicle respected the rules of an intersection at a time if
+the intersection displays stop sign
+and the vehicle stops at the intersection at the time.
+
+a vehicle respected the rules of an intersection at a time if
+a road user is close to the vehicle at the intersection
+    or the road user is waiting to cross the intersection
+    or the road user is in the intersection
+        and the road user is of type long vehicle
+and the vehicle slows down at the intersection at the time.
+
+% Emergency and Incident Support vehicles. 
+% You should look and listen for ambulances, fire engines, police, doctors or other emergency vehicles 
+% using flashing blue, red or green lights and sirens or flashing headlights, 
+% or traffic officer and incident support vehicles using flashing amber lights.
+% When one approaches do not panic.
+% Consider the route of such a vehicle and take appropriate action to let it pass, while complying with all traffic signs. 
+% If necessary, pull to the side of the road and stop, but try to avoid stopping before the brow of a hill, 
+% a bend or narrow section of road. Do not endanger yourself, other road users or pedestrians and avoid mounting the kerb. 
+% Do not brake harshly on approach to a junction or roundabout, as a following vehicle may not have the same view as you.
+
+% How do we define violations of rules that should be respected?
+% argumentation theory, exceptions through negation as failure?
+
+% a vehicle can violate the rules of an intersection at a time if
+a vehicle should give way to an other vehicle at an intersection at a time if
+% the other vehicle is of type emergency vehicle
+the other vehicle needs to enter the intersection at the time.
+
+% Intermediate method to check if there is a safe gap
+% comparing the actual safe gap with what the sensors can see?
+there is a safe gap for a vehicle at an intersection at a time if
+there is a gap for the vehicle at the intersection of a distance at the time
+and the safe gap at the intersection at the time is of a second distance
+and the distance >= the second distance.
+
+% This is the dynamic section of the safe gap
+% The conditions for this can be found in different sections of the HC,
+% and in commonsense reasoning
+the safe gap at an intersection at a time is of an amount if 
+the safe gap at the intersection is of an other amount
+and the safe gap modifiers at the intersection at the time amount to a number
+and the amount is the other amount + the number.
+
+scenario one is:
+intersection1 displays stop sign.
+car1 stops at intersection1 at 5.
+there is a gap for car1 at intersection1 of 10 at 10.
+the safe gap at intersection1 is of 7.
+the safe gap modifiers at intersection1 at 10 amount to 2.
+emergency vehicle needs to enter intersection1 at 10.
+there is a gap for car1 at intersection1 of 10 at 12.
+the safe gap modifiers at intersection1 at 12 amount to 1.
+
+scenario one_fail is:
+intersection1 displays stop sign.
+car1 stops at intersection1 at 5.
+there is a gap for car1 at intersection1 of 7 at 10.
+the safe gap at intersection1 is of 7.
+the safe gap modifiers at intersection1 at 10 amount to 5.
+
+scenario two is:
+car2 slows down at intersection2 at 10.
+truck1 is in intersection2.
+truck1 is of type long vehicle.
+there is a safe gap for car2 at intersection2 at 12.
+
+query one is:
+which vehicle has the permission that which eventuality.
+
+query slow_down is:
+which vehicle slows down at which intersection at which time.
