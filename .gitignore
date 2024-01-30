@@ -1,0 +1,7 @@
+# Prolog
+*.pl~
+*.swp
+*.bak
+
+# Ignore the runtime files
+**/violations.pl

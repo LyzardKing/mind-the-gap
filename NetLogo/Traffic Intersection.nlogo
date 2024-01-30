@@ -34,7 +34,7 @@ signs-own [
 ]
 
 to startup
-  if not netprologo:run-query "consult('traffic_rules.pl')"
+  if not netprologo:run-query "consult('../Prolog/traffic_rules.pl')"
   [
     user-message "Error loading prolog file"
   ]
@@ -90,11 +90,11 @@ to go
   make-new-car freq-east min-pxcor -1 90
   make-new-car freq-east max-pxcor 1 -90
 
-  make-new-car freq-north 13 min-pycor 0
-  make-new-car freq-north 11 max-pycor 180
+  ;make-new-car freq-north 13 min-pycor 0
+  ;make-new-car freq-north 11 max-pycor 180
   ; make pedestrians
-  make-new-pedestrian freq-east * 30 -3 min-pycor 0
-  make-new-pedestrian freq-east * 30 min-pxcor -3 90
+  ; make-new-pedestrian freq-east * 30 -3 min-pycor 0
+  ; make-new-pedestrian freq-east * 30 min-pxcor -3 90
   ; if we are in "auto" mode and a light has been
   ; green for long enough, we turn it yellow
   if auto? and elapsed? green-length [
@@ -167,25 +167,25 @@ end
 to move ; turtle procedure
   ; Some cars will turn at the intersection.
   ; The system should not break in this case.
-  if (xcor > min-pxcor and ycor > min-pycor and xcor < max-pxcor and ycor < max-pycor) [
-    let front_color [pcolor] of patch-at-heading-and-distance heading 1
-    let past_color [pcolor] of patch-at-heading-and-distance heading -1
-    if  (past_color != front_color) and in-intersection? [
-      if (front_color = pink) [
-        if random 100 < 90 [
-          set heading heading + 90
-        ]
-      ]
-      if (front_color = black) [
-        if random 100 < 90 [
-          set heading heading - 90
-        ]
-      ]
-    ]
-  ]
+;  if (xcor > min-pxcor and ycor > min-pycor and xcor < max-pxcor and ycor < max-pycor) [
+;    let front_color [pcolor] of patch-at-heading-and-distance heading 1
+;    let past_color [pcolor] of patch-at-heading-and-distance heading -1
+;    if  (past_color != front_color) and in-intersection? [
+;      if (front_color = pink) [
+;        if random 100 < 90 [
+;          set heading heading + 90
+;        ]
+;      ]
+;      if (front_color = black) [
+;        if random 100 < 90 [
+;          set heading heading - 90
+;        ]
+;      ]
+;    ]
+;  ]
   adjust-speed
   repeat speed [ ; move ahead the correct amount
-    fd 1 ;/ 10
+    fd 1 / 10
     if not can-move? 1 [ die ] ; die when I reach the end of the world
     if any? accidents-here [
       ; if I hit an accident, I cause another one
@@ -248,6 +248,10 @@ to-report next-blocked-patch ; turtle procedure
   report patch-to-check
 end
 
+to-report patches-ahead [ dis ] ; turtle reporter
+  report []
+end
+
 to-report is-blocked? [ target-patch ] ; turtle reporter
   let target_patch_x [pxcor] of target-patch
   let target_patch_y [pycor] of target-patch
@@ -261,15 +265,15 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   let sign_spec ([spec] of signs-on target-patch)
 
   report
-  any? other cars-on target-patch or (self_shape != "person" and any? other pedestrians-on target-patch) or
+  any? other cars-on target-patch or any? other cars in-cone 5 45 or (self_shape != "person" and any? other pedestrians-on target-patch) or
   ;(self_shape != "person" and (any? (other turtles-on target-patch) with [shape != "square"]))or
     any? accidents-on target-patch or
     ; replaced ; in-radius 6 with in-cone 6 180
-  (any? (lights-on target-patch) and self_shape != "person" and
+  (any? (lights in-cone 3 10) and self_shape != "person" and
     ; ([behaviour] of turtle who = "good") and
     netprologo:run-query(netprologo:build-prolog-call "not_enter_junction(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)" who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) xcor ycor)
   ) or
-  (any? (signs-on target-patch) and self_shape != "person" and
+  (any? (signs in-cone 3 10) and self_shape != "person" and
     netprologo:run-query(netprologo:build-prolog-call "not_enter_junction(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)" who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) xcor ycor)
   ); or
   ;( self_shape != "person" and
@@ -370,8 +374,8 @@ GRAPHICS-WINDOW
 17
 -17
 17
-1
-1
+0
+0
 1
 ticks
 30.0
@@ -436,7 +440,7 @@ green-length
 green-length
 1
 50
-12.0
+50.0
 1
 1
 NIL
@@ -537,7 +541,7 @@ yellow-length
 yellow-length
 0
 10
-3.0
+10.0
 1
 1
 NIL
