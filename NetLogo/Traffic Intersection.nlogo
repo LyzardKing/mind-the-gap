@@ -167,7 +167,8 @@ end
 to move ; turtle procedure
   ; Some cars will turn at the intersection.
   ; The system should not break in this case.
-;  if (xcor > min-pxcor and ycor > min-pycor and xcor < max-pxcor and ycor < max-pycor) [
+;  if (xcor > min-pxcor and ycor > min-pycor and xcor < max-pxcor and ycor < max-pycor) and
+;  xcor mod 1 < 0.01 and ycor mod 1 < 0.01 [
 ;    let front_color [pcolor] of patch-at-heading-and-distance heading 1
 ;    let past_color [pcolor] of patch-at-heading-and-distance heading -1
 ;    if  (past_color != front_color) and in-intersection? [
@@ -265,7 +266,7 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   let sign_spec ([spec] of signs-on target-patch)
 
   report
-  any? other cars-on target-patch or any? other cars in-cone 5 45 or (self_shape != "person" and any? other pedestrians-on target-patch) or
+  any? other cars-on target-patch or any? other cars in-cone 3 45 or (self_shape != "person" and any? other pedestrians-on target-patch) or
   ;(self_shape != "person" and (any? (other turtles-on target-patch) with [shape != "square"]))or
     any? accidents-on target-patch or
     ; replaced ; in-radius 6 with in-cone 6 180
@@ -540,8 +541,8 @@ SLIDER
 yellow-length
 yellow-length
 0
-10
-10.0
+25
+25.0
 1
 1
 NIL
