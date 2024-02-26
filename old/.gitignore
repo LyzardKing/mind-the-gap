@@ -5,4 +5,3 @@
 
 # Ignore the runtime files
 **/violations.pl
-**/*.tmp.nlogo
