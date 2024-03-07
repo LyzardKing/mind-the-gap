@@ -1,55 +1,38 @@
 the target language is: prolog.
 
 the templates are:
-*a vehicle* can *an action*.
-*a vehicle* is in the junction.
+
 % *a vehicle* is a *a type*.
+*a vehicle* can *an action*.
 *a vehicle* has *a color* light.
-*a vehicle* has a *a sign* sign.
-*a vehicle* must give way to *an other vehicle*.
-*a vehicle* must *an action*.
-*a vehicle* is stopped.
-the distance between *a vehicle* and *a sign* is *a distance*.
-*a vehicle* is approaching *a vehicle*.
-*a vehicle* must not enter the junction.
 *a vehicle* has *a property* of *a value*.
-*a property* of *a vehicle* is *a value*.
+*a vehicle* has a *a sign* sign.
+*a vehicle* is approaching *a vehicle*.
+*a vehicle* is in the junction.
+*a vehicle* is stopped.
+*a vehicle* must *an action*.
+*a vehicle* must give way to *an other vehicle*.
+*a vehicle* must not *an action*.
+the distance between *a vehicle* and *a sign* is *a distance*.
 
 % Monitor
 *a vehicle* violates *a rule*.
-*a vehicle* must pay *a fine*.
-the penalty for *a rule* is *a fine*.
-*a vehicle* repairs *a fine*.
-*a vehicle* pays *a fine*.
+% *a vehicle* must pay *a fine*.
+% the penalty for *a rule* is *a fine*.
+% *a vehicle* repairs *a fine*.
+% *a vehicle* pays *a fine*.
 
 % Add the vehicle behaviour to the knowledge base.
 % What is a good/bad AV? What is a good/bad human driver?
 
 % an ambulance might need to give way, like other vehicles.
-the knowledge base av_rules includes:
-
-%The following is not the rules of the road, but the monitor
-%and violations, penalties, and reparations
-
-a vehicle violates entering the junction if
-the behaviour of a vehicle is bad
-and it is not the case that
-    the vehicle can enter the junction.
-
-a vehicle must pay a fine if
-the vehicle violates entering the junction
-and the penalty for entering the junction is the fine.
-
-a vehicle repairs a fine if
-the vehicle must pay the fine
-and the vehicle pays the fine. 
-
+the knowledge base traffic_rules includes:
 
 % Bad drivers can ignore the rule.
 % At the moment in LE this is a hard constraint.
 % This should be moved to the NetLogo part, to keep the log.
 a vehicle must not enter the junction if
-the behaviour of the vehicle is good
+the vehicle has behaviour of good
 and it is not the case that
     the vehicle can enter the junction.
     
@@ -69,26 +52,23 @@ and the vehicle is in the junction
 and it is not the case that
     the vehicle must give way to an other vehicle.
 
-% This rule is unnecessary, since the vehicle will stop, then react.
-% a vehicle can enter the junction if
-% the vehicle has a stop sign
-% and it is not the case that
-%     the vehicle must give way to an other vehicle.
+a vehicle can enter the junction if
+the vehicle has a stop sign
+and the vehicle is stopped
+and it is not the case that
+    the vehicle must give way to an other vehicle.
 
 % Determine the distance between the vehicle and the sign.
 % In particular the distance in front of the vehicle.
 % If the distance is less than 1, the vehicle must stop.
 % 1 unit of measure in the simulation = 1 patch in netlogo.
 % TODO: in LE add a thing is less than a thing.
-a vehicle must stop if
-the vehicle has a stop sign
-and the distance between the vehicle and the sign is a distance
-and the distance < 1
-and it is not the case that
-    the vehicle is stopped.
-
-a vehicle must give way if
-the vehicle has a give way sign.
+% a vehicle must stop if
+% the vehicle has a stop sign
+% and the distance between the vehicle and the sign is a distance
+% and the distance < 1
+% and it is not the case that
+%     the vehicle is stopped.
 
 % For now the approaching vehicle is the neighbour in the old version
 a vehicle must give way to an other vehicle if
@@ -110,26 +90,33 @@ and the other vehicle is approaching the vehicle.
 a vehicle is stopped if
 the vehicle has speed of 0.
 
-% Change the condition. At the moment just a placeholder
-% Different if we want to consider approaching only from one direction
-% In particular, given the possible values we want
-% the difference (abs) to be 90 (or less than 180 in any case)
-a vehicle is approaching an other vehicle if
-the vehicle has direction of a direction
-and the other vehicle has direction of an other direction
-and the direction is different from the other direction.
-% and the direction - the other direction is 90.
+% Monitor functions
+
+a vehicle violates entering the junction if
+the vehicle has red light
+and it is not the case that
+    the vehicle is of type ambulance
+and it is not the case that
+    the vehicle is stopped.
+
+% a vehicle must pay a fine if
+% the vehicle violates entering the junction
+% and the penalty for entering the junction is the fine.
+
+% a vehicle repairs a fine if
+% the vehicle must pay the fine
+% and the vehicle pays the fine. 
 
 scenario ambulance is:
-123 is a ambulance.
+123 is of type ambulance.
 
 scenario car is:
-456 is a car.
+456 is of type car.
 456 has green light.
-123 is a ambulance.
+123 is of type ambulance.
 
 scenario car_stop is:
-234 is a car.
+234 is of type car.
 234 has a stop sign.
 
 query enter is:

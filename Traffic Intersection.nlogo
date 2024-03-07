@@ -38,12 +38,17 @@ signs-own [
   spec
 ]
 
+breed [ monitors monitor ]
+monitors-own [
+  fined
+]
+
 to startup
   consult-prolog
 end
 
 to consult-prolog
-  if not netprologo:run-query "consult('traffic_rules_le.pl')"
+  if not netprologo:run-query "consult('traffic_rules.pl')"
   [
     user-message "Error loading prolog file"
   ]
@@ -56,7 +61,7 @@ end
 to setup
   clear-all
   retract-all
-  consult-prolog
+  ; consult-prolog
   set time_mul 100
   set halt false
   set-default-shape lights "square"
@@ -64,6 +69,7 @@ to setup
   set-default-shape cars "car"
   set-default-shape pedestrians "person"
   set-default-shape signs "x"
+  set-default-shape monitors "arrow"
   ask patches [
     set pcolor green - 1
   ]
@@ -83,6 +89,11 @@ to setup
 
   add_intersection_lights -8 0
   add_intersection_stop 8 0 "v"
+
+  add_monitor -6 -4 270
+  ask monitors [
+    ask patch-ahead 1 [set pcolor blue]
+  ]
   reset-ticks
 end
 
@@ -141,6 +152,13 @@ to add_intersection_color [x y]
   ]
 end
 
+to add_monitor [x y dir]
+  ask patch x y [ sprout-monitors 1 [
+    set heading dir
+    set fined []
+  ] ]
+end
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;RUNTIME PROCEDURES;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -152,6 +170,7 @@ to go
   ask cars [ move ]
   ask pedestrians [ move ]
   ask ambulances [ move ]
+  ask monitors [ validate ]
   check-for-collisions
 
   ; Insert Monitor here!
@@ -183,6 +202,30 @@ to go
     change-to-red
   ]
   tick
+end
+
+
+; At the moment there is only one car visible at a time by the monitor
+to validate ; monitor function
+  let monitored cars-on patch-ahead 1
+  if any? monitored [
+    let car_list [who] of monitored
+    foreach car_list [ x ->
+      ; Collect information to send to Prolog
+      ; Check if already fined. This should be moved to prolog, but is here for efficiency.
+      if not member? x fined and netprologo:run-query(netprologo:build-prolog-call ( word
+        "snapshot(("
+        "asserta(speed(?1, ?2, ?4)),"
+        "asserta(has_light(?1, ?3, ?4)),"
+        "violates(?1, 'entering the junction')"
+        "))") x ([speed] of turtle x) ([color] of lights-on patch-ahead 1) ticks) [
+        set fined lput x fined
+        if not netprologo:run-query(netprologo:build-prolog-call "add_violation(?1, ?2, 'entering the junction', ?3)" x ([shape] of turtle x) ([color] of lights-on patch-ahead 1)) [
+          show "Error"
+        ]
+      ]
+    ]
+  ]
 end
 
 ; to monitor
@@ -326,30 +369,18 @@ to move ; turtle procedure
   ]
 end
 
-;to change-lane
-;  ; The target lane to overtake is usually the one on the left
-;  set heading ifelse-value target-lane < ycor [ 180 ] [ 0 ]
-;  let blocking-cars other turtles in-cone (1 + abs (ycor - target-lane)) 180 with [ x-distance <= 1 ]
-;  let blocking-car min-one-of blocking-cars [ distance myself ]
-;  ifelse blocking-car = nobody [
-;    forward 0.2
-;    set ycor precision ycor 1 ; to avoid floating point errors
-;  ] [
-;    ; slow down if the car blocking us is behind, otherwise speed up
-;    ifelse towards blocking-car <= 180 [ slow-down-car ] [ speed-up-car ]
-;  ]
-;end
-
 to adjust-speed
+  ; TODO: add variable speed from stopped.
   ; calculate the minimum and maximum possible speed I could go
 
   ; If I am a human, I will think I can brake as an AV, at least to determine the speed I can go to
   ; I will (randomly) decide to go faster than the max speed
   let limit speed-limit
   let accel max-accel
+  ; TODO: move to property of HV
   if shape = "car" and not autonomous [
     if random 100 < 50 [
-      set limit speed-limit * 1.2
+      set limit speed-limit * 1.25
     ]
     if speed = 0 and random 100 < 20 [
       set accel 0
@@ -415,7 +446,7 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   let target_patch_y [pycor] of target-patch
   let self_shape [shape] of turtle who
   let self_heading [heading] of turtle who
-  let other_turtles (other turtles in-cone 6 120) with [heading != self_heading]
+  let other_turtles (other cars in-cone 10 180) with [abs (heading - self_heading) = 90 or abs (heading - self_heading) = 270 and speed != 0] ; [heading != self_heading] ;
   ; let self_behaviour ([behaviour] of turtle who)
   let self_distance (distance target-patch)
   let self_speed ([speed] of turtle who)
@@ -423,34 +454,27 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   let light_color ([color] of lights in-radius 0.5)
   let sign_spec ([spec] of signs in-radius 0.5)
   let in_intersection 0
-
   if in-intersection? [
     set in_intersection 1
   ]
+; Uncomment to debug if inconsistent behaviour
+;  if (any? (signs in-radius 0.5)) [
+;    show ([behaviour] of turtle who)
+;    show self_distance
+;    show self_speed
+;    show light_color
+;    show sign_spec
+;    show self_shape
+;    show ([shape] of other_turtles)
+;  ]
   report
   any? other cars-on target-patch or (self_shape != "person" and any? other pedestrians-on target-patch) or
     any? accidents-on target-patch or
     ; replaced ; in-radius 6 with in-cone 6 180
-  (any? (lights in-radius 0.5) and self_shape != "person" and
+  ((any? (lights in-radius 0.5) or (any? (signs in-radius 0.5))) and self_shape != "person" and
     ; ([behaviour] of turtle who = "good") and
     ; netprologo:run-query(netprologo:build-prolog-call "not_enter_junction(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)" who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) in_intersection)
-    netprologo:run-query(netprologo:build-prolog-call ( word
-      "snapshot(("
-      "asserta(behaviour(?1, ?2, ?10)),"
-      "asserta(distance(?1, ?3, ?10)),"
-      "asserta(speed(?1, ?4, ?10)),"
-      "asserta(has_light(?1, ?5, ?10)),"
-      "asserta(has_sign(?1, ?6, ?10)),"
-      "asserta(is_of_type(?1, ?7, ?10)),"
-      "asserta(has_neighbours(?1, ?8, ?10)),"
-      "asserta(is_in_junction(?1, ?9, ?10)),"
-      "not_enter_junction_out(?1, ?10)"
-      "))") who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) in_intersection ticks)
-  ) or
-  (any? (signs in-radius 0.5) and self_shape != "person" and speed > 0 and
-    ; netprologo:run-query(netprologo:build-prolog-call "not_enter_junction(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)" who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) in_intersection)
-    ; Add a timer for the stop sign? or make the condition to restart more complex
-        netprologo:run-query(netprologo:build-prolog-call ( word
+      netprologo:run-query(netprologo:build-prolog-call ( word
       "snapshot(("
       "asserta(behaviour(?1, ?2, ?10)),"
       "asserta(distance(?1, ?3, ?10)),"
@@ -463,13 +487,6 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
       "not_enter_junction_out(?1, ?10)"
       "))") who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) in_intersection ticks)
   )
-  or
-  (
-    any? (signs in-radius 0.5) and any? other cars in-cone 5 120 with [heading != self_heading and speed != 0]
-  )
-  ;( self_shape != "person" and
-  ;  netprologo:run-query(netprologo:build-prolog-call "give_way(?1, ?2, ?3, ?4)" who ([behaviour] of turtle who) ([shape] of other_turtles) "_")
-  ;)
 end
 
 ; TODO: write with prolog link
@@ -815,7 +832,7 @@ freq-bad-cars
 freq-bad-cars
 0
 100
-20.0
+87.0
 1
 1
 NIL
