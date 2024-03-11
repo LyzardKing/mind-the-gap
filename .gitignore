@@ -6,3 +6,6 @@
 # Ignore the runtime files
 **/violations.pl
 **/*.tmp.nlogo
+
+node
+pack/traffic_rules
