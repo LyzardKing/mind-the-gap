@@ -91,9 +91,6 @@ to setup
   add_intersection_stop 8 0 "v"
 
   add_monitor -6 -4 270
-  ask monitors [
-    ask patch-ahead 1 [set pcolor blue]
-  ]
   reset-ticks
 end
 
@@ -153,10 +150,14 @@ to add_intersection_color [x y]
 end
 
 to add_monitor [x y dir]
-  ask patch x y [ sprout-monitors 1 [
-    set heading dir
-    set fined []
-  ] ]
+  ask patch x y [
+    sprout-monitors 1 [
+      set heading dir
+      set fined []
+      set color 2
+    ]
+    ask patch-at-heading-and-distance dir 1 [set pcolor blue]
+  ]
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -832,7 +833,7 @@ freq-bad-cars
 freq-bad-cars
 0
 100
-87.0
+0.0
 1
 1
 NIL
