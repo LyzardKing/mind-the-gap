@@ -4,7 +4,13 @@
 
 :- include('netlogo_glue.pl').
 % :- include('traffic_rules-prolog.pl').
+
+:- if(current_module(wasm)).
+:- use_module('/traffic_rules-prolog.pl').
+:- else.
 :- use_module('traffic_rules-prolog.pl').
+:- endif.
+
 
 :- dynamic behaviour/2.
 :- dynamic distance/2.
@@ -47,10 +53,10 @@ has_neighbour(Self, Neighbour, Time) :-
 % It should(TM) be more efficient
 not_enter_junction_out(Self, Time) :-
     % must_not_enter_the_junction(Self).
-    'traffic_rules-prolog':must_not(Self, 'enter the junction') .
+    'traffic_rules-prolog':must_not(Self, 'enter the junction').
 
 violates(A, B) :-
-    'traffic_rules-prolog':violates(A, B) .
+    'traffic_rules-prolog':violates(A, B).
 
 % Temporary glue
 is_a(A, B) :-

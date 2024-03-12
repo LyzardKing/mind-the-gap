@@ -11,7 +11,7 @@ the templates are:
 *a vehicle* is in the junction.
 *a vehicle* is stopped.
 *a vehicle* must *an action*.
-*a vehicle* must give way to *an other vehicle*.
+*a vehicle* must give way to *a vehicle*.
 *a vehicle* must not *an action*.
 the distance between *a vehicle* and *a sign* is *a distance*.
 
@@ -121,3 +121,14 @@ scenario car_stop is:
 
 query enter is:
 which car can enter the junction.
+
+% Test
+% snapshot((asserta(behaviour(a, good, 0)),
+% asserta(distance(a, 20.32, 0)),
+% asserta(speed(a, 0, 0)),
+% asserta(has_light(a, [], 0)),
+% asserta(has_sign(a, [stop], 0)),
+% asserta(is_of_type(a, car, 0)),
+% asserta(has_neighbours(a, [a,b], 0)),
+% asserta(is_in_junction(a, 0, 0)),
+% not_enter_junction_out(a, 0))).
