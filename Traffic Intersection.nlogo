@@ -172,7 +172,7 @@ to go
   ask cars [ move ]
   ask pedestrians [ move ]
   ask ambulances [ move ]
-  ask monitors [ validate ]
+  ask monitors [ validate speed-validate ]
   check-for-collisions
 
   ; Insert Monitor here!
@@ -228,6 +228,33 @@ to validate ; monitor function
       ]
     ]
   ]
+end
+
+; MINE
+ ;At the moment there is only one car visible at a time by the monitor
+to speed-validate ; monitor function
+  let monitored cars-on patch-ahead 1
+  if any? monitored [
+    let car_list [who] of monitored ;who is vehicle ID
+    let max_excess_speed speed-limit * 0.25
+
+    foreach car_list [ x ->
+      show [speed] of turtle x
+      if not member? x fined and netprologo:run-query(netprologo:build-prolog-call ( word
+         "snapshot(("
+          "asserta(speed(?1, ?2, ?5)),"
+          "asserta(the_speed_limit_is(?3)),"
+          "asserta(the_allowed_excess_is(?4)),"
+          "traffic_rules:violates(?1, 'speeding')"
+          "))") x ([speed] of turtle x) speed-limit max_excess_speed ticks) [
+                    ; these variables are the placeholders ?1 = x, ?2 = speed of turtle x etc
+        set fined lput x fined
+          if not netprologo:run-query(netprologo:build-prolog-call "utils:add_violation(?1, ?2, 'speeding', ?3)" x ([shape] of turtle x) ([speed] of turtle x)) [
+          show "Error"
+            ]
+          ]
+        ]
+     ]
 end
 
 ; to monitor
@@ -668,7 +695,7 @@ speed-limit
 speed-limit
 1
 10
-4.0
+8.0
 1
 1
 NIL
@@ -728,7 +755,7 @@ freq-east
 freq-east
 0
 100
-25.0
+0.0
 5
 1
 %
@@ -831,7 +858,7 @@ freq-bad-cars
 freq-bad-cars
 0
 100
-0.0
+100.0
 1
 1
 NIL
