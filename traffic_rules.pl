@@ -1,46 +1,42 @@
+:- module(traffic_rules, [
+        % is_a/2,
+        % the_distance_between_and_is/3,
+        % has_of/3,
+        % is_approaching/2,
+        % has_a_sign/2,
+        % has_light/2,
+        % is_in_the_junction/1,
+        not_enter_junction_out/2,
+        behaviour/3,
+        distance/3,
+        speed/3,
+        has_light/3,
+        has_sign/3,
+        is_of_type/3,
+        has_neighbours/3,
+        is_in_junction/3
+    ]).
+
 :-style_check(-singleton).
 :-style_check(-discontiguous).
 :- op(900,fx,user:not). % same as \+
 
-:- include('netlogo_glue.pl').
-% :- include('traffic_rules-prolog.pl').
+:- use_module('utils/utils.pl').
 
 :- if(current_module(wasm)).
-:- use_module('/traffic_rules-prolog.pl').
+:- use_module('/traffic_rules-prolog.pl', [violates/2, must_not/2]).
 :- else.
-:- use_module('traffic_rules-prolog.pl').
+:- use_module('traffic_rules-prolog', [violates/2, must_not/2]).
 :- endif.
 
-
-:- dynamic behaviour/2.
-:- dynamic distance/2.
-:- dynamic speed/2.
-:- dynamic has_light/2. 
-:- dynamic has_sign/2.
-:- dynamic is_of_type/2.
-:- dynamic has_neighbours/2.
-:- dynamic is_in_junction/2.
-
-% Add \+ give_way to enter_junction.
-% Keep all parameters in arguments or assert facts?
-% Logo deals with the "sensor" part of the simulation,
-% such as avoiding other cars.
-% The Prolog rules determine which actions can be executed
-% in "normal" scenarios (no accidents involved).
-
-% Neighbours are all the agents in a 3 block range from self
-% who are moving in a different direction.
-% the coordinates in give_way are used to filter out
-% the agents behind self.
-
-% Possibiity or prohibition to enter the intersection.
-% One represented as the opposite of the other, but
-% logically the possibility is given by the sensors:
-%   - there is no impediment on the road
-% the prohibition is given by the norms:
-%   - there is something that prohibits this action, even
-%     though it is still possible.
-% In the second case there is a violation.
+:- dynamic behaviour/3.
+:- dynamic distance/3.
+:- dynamic speed/3.
+:- dynamic has_light/3.
+:- dynamic has_sign/3.
+:- dynamic is_of_type/3.
+:- dynamic has_neighbours/3.
+:- dynamic is_in_junction/3.
 
 has_neighbour(Self, Neighbour, Time) :-
     has_neighbours(Self, Ns, Time),
@@ -52,35 +48,34 @@ has_neighbour(Self, Neighbour, Time) :-
 % There is no more if condition because everything happens in a snapshot.
 % It should(TM) be more efficient
 not_enter_junction_out(Self, Time) :-
-    % must_not_enter_the_junction(Self).
-    'traffic_rules-prolog':must_not(Self, 'enter the junction').
+    must_not(Self, 'enter the junction').
 
 violates(A, B) :-
     'traffic_rules-prolog':violates(A, B).
 
 % Temporary glue
-is_a(A, B) :-
+'traffic_rules-prolog':is_a(A, B) :-
     is_of_type(A, B, _).
 
-has_of(A, behaviour, B) :-
+'traffic_rules-prolog':has_of(A, behaviour, B) :-
     behaviour(A, B, _).
 
-the_distance_between_and_is(A, 'the sign', B) :-
+'traffic_rules-prolog':the_distance_between_and_is(A, 'the sign', B) :-
     distance(A, B, _).
 
-has_of(A, speed, B) :-
+'traffic_rules-prolog':has_of(A, speed, B) :-
     speed(A, B, _).
     
-is_approaching(Neighbour, Self) :-
+'traffic_rules-prolog':is_approaching(Neighbour, Self) :-
     has_neighbour(Self, Neighbour, _).
 
-has_a_sign(A, B) :-
+'traffic_rules-prolog':has_a_sign(A, B) :-
     has_sign(A, [B], _).
 
-has_light(A, B) :-
+'traffic_rules-prolog':has_light(Self, B) :-
     has_light(Self, [Light], _),
-    color(Light, B).
+    netlogo:color(Light, B).
 
-is_in_the_junction(A) :-
+'traffic_rules-prolog':is_in_the_junction(A) :-
     is_in_junction(A, InIntersection, _),
     InIntersection is 1.

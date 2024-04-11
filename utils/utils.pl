@@ -1,4 +1,10 @@
+:- module(utils, []).
+
+:- use_module(le).
+:- use_module(netlogo).
+
 %% Rules to bridge prolog and Logo
+
 :- dynamic violation/4.
 
 :- prolog_load_context(directory, Dir),
@@ -28,37 +34,6 @@ log(yellow, Self, CarType, LightNum, X, Y) :-
     swritef(Message, '%w %w crossed with a %w light seen at position %w %w.', [CarType, Self, Light, X, Y]),
     print_message(warning, Message).
 
-color(55, green).
-color(45, yellow).
-color(15, red).
-color(9.9, white).
-
-emergency_vehicle(Vehicle) :-
-    % Set one of the colours to be the emergency vehicle
-    % 85 is colour cyan.
-    % Change to emergency_vehicle in the NetLogo and Prolog code.
-    % member('truck', Vehicle).
-    Vehicle == 'ambulance'.
-
-emergency_vehicles(Vehicle) :-
-    member(ambulance, Vehicle).
-
-pedestrian(Vehicle) :-
-    % Identify pedestrian by type
-    member(person, Vehicle).
-
-in_intersection(InIntersection) :-
-    % Check if the vehicle is in the intersection
-    % InIntersection is true if set to 1
-    InIntersection == 1.
-
-% in_intersection(X, Y) :-
-%     X > -5,
-%     Y > -5.
-
-% in_intersection(X, Y) :-
-%     X > -5,
-%     Y > -5.
 
 add_violation(Vehicle, CarType, Violation, Context) :-
     % Context is anonymous to avoid repeating the same violation.
@@ -67,7 +42,7 @@ add_violation(Vehicle, CarType, Violation, Context) :-
     ;   assertz(violation(Vehicle, CarType, Violation, Context))
     ).
 
-log_violations() :-
+log_violations :-
     log_path(Path),
     string_concat(Path, '/violations.pl', PathFull),
     atom_string(PathAtom, PathFull),

@@ -49,6 +49,7 @@ end
 
 to consult-prolog
   if not netprologo:run-query "consult('traffic_rules.pl')"
+  ; if not netprologo:run-query "use_module('traffic_rules.pl')"
   [
     user-message "Error loading prolog file"
   ]
@@ -61,7 +62,7 @@ end
 to setup
   clear-all
   retract-all
-  ; consult-prolog
+  consult-prolog
   set time_mul 100
   set halt false
   set-default-shape lights "square"
@@ -218,10 +219,10 @@ to validate ; monitor function
         "snapshot(("
         "asserta(speed(?1, ?2, ?4)),"
         "asserta(has_light(?1, ?3, ?4)),"
-        "violates(?1, 'entering the junction')"
+        "traffic_rules:violates(?1, 'entering the junction')"
         "))") x ([speed] of turtle x) ([color] of lights-on patch-ahead 1) ticks) [
         set fined lput x fined
-        if not netprologo:run-query(netprologo:build-prolog-call "add_violation(?1, ?2, 'entering the junction', ?3)" x ([shape] of turtle x) ([color] of lights-on patch-ahead 1)) [
+        if not netprologo:run-query(netprologo:build-prolog-call "utils:add_violation(?1, ?2, 'entering the junction', ?3)" x ([shape] of turtle x) ([color] of lights-on patch-ahead 1)) [
           show "Error"
         ]
       ]
@@ -352,7 +353,7 @@ to move ; turtle procedure
   adjust-speed
   repeat speed [ ; move ahead the correct amount
     fd 1 / 100
-     if not can-move? 1 [ die ] ; die when I reach the end of the world
+      if not can-move? 1 [ die ] ; die when I reach the end of the world
     ; or turn in a random direction
 ;    if shape != "person" and (not can-move? 3) [
 ;       ifelse random 100 < 50 [
@@ -485,13 +486,10 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
       "asserta(is_of_type(?1, ?7, ?10)),"
       "asserta(has_neighbours(?1, ?8, ?10)),"
       "asserta(is_in_junction(?1, ?9, ?10)),"
-      "not_enter_junction_out(?1, ?10)"
+      "traffic_rules:not_enter_junction_out(?1, ?10)"
       "))") who ([behaviour] of turtle who) self_distance self_speed light_color sign_spec self_shape ([shape] of other_turtles) in_intersection ticks)
   )
 end
-
-; TODO: write with prolog link
-; to-report can-overtake
 
 to-report make-way?
   let self_heading [heading] of turtle who
@@ -554,7 +552,7 @@ to-report elapsed? [ time-length ]
 end
 
 to log-violations
-  if not netprologo:run-query "log_violations()" [
+  if not netprologo:run-query "utils:log_violations()" [
     show "Cannot log violations"
   ]
 end
