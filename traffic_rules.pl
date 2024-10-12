@@ -14,7 +14,8 @@
         has_sign/3,
         is_of_type/3,
         has_neighbours/3,
-        is_in_junction/3
+        is_in_junction/3,
+        violates/2
     ]).
 
 :-style_check(-singleton).
@@ -50,8 +51,9 @@ has_neighbour(Self, Neighbour, Time) :-
 not_enter_junction_out(Self, Time) :-
     must_not(Self, 'enter the junction').
 
-violates(A, B) :-
-    'traffic_rules-prolog':violates(A, B).
+# % violates(A, B) :-
+# 'traffic_rules-prolog':violates(A, B) :-
+#     violates(A, B).
 
 % Temporary glue
 'traffic_rules-prolog':is_a(A, B) :-
@@ -79,3 +81,6 @@ violates(A, B) :-
 'traffic_rules-prolog':is_in_the_junction(A) :-
     is_in_junction(A, InIntersection, _),
     InIntersection is 1.
+
+'traffic_rules-prolog':is_past_the_stop_line(A) :-
+    'traffic_rules-prolog':is_in_the_junction(A).

@@ -56,7 +56,7 @@ violates(A, speeding) :-
     not is_a(A, ambulance).
 example(null, []).
 example(ambulance, [scenario([(is_a(123, ambulance):-true)], true)]).
-example(car, [scenario([(is_a(456, car):-true), (has_light(456, green):-true), (is_a(123, ambulance):-true)], true)]).
+example(car, [scenario([(is_a(456, car):-true), (has_light(456, green):-true), (is_a(123, ambulance):-true), (is_approaching(123, 456):-true)], true)]).
 example(car_stop, [scenario([(is_a(234, car):-true), (has_a_sign(234, stop):-true)], true)]).
 example(monitor, [scenario([(is_a(456, car):-true), (has_light(456, red):-true)], true)]).
 example(monitor_2, [scenario([(is_a(456, ambulance):-true), (has_light(456, red):-true)], true)]).

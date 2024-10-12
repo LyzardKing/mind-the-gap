@@ -3,6 +3,7 @@ extensions[netprologo]
 globals [
   ticks-at-last-change  ; value of the tick counter the last time a light changed
   total_accidents
+  total_violators
   time_mul
   halt
 ]
@@ -165,6 +166,13 @@ end
 ;;RUNTIME PROCEDURES;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
+to go_until
+  if any? cars with [ shape = "turtle" ] [
+   stop
+  ]
+  go
+end
+
 to go
   if halt [
     stop
@@ -209,7 +217,7 @@ end
 
 ; At the moment there is only one car visible at a time by the monitor
 to validate ; monitor function
-  let monitored cars-on patch-ahead 1
+  let monitored cars-on patch-right-and-ahead 30 1
   if any? monitored [
     let car_list [who] of monitored
     foreach car_list [ x ->
@@ -222,9 +230,12 @@ to validate ; monitor function
         "traffic_rules:violates(?1, 'entering the junction')"
         "))") x ([speed] of turtle x) ([color] of lights-on patch-ahead 1) ticks) [
         set fined lput x fined
+        ask turtle x [ set shape "turtle" ]
+        set total_violators total_violators + 1
         if not netprologo:run-query(netprologo:build-prolog-call "utils:add_violation(?1, ?2, 'entering the junction', ?3)" x ([shape] of turtle x) ([color] of lights-on patch-ahead 1)) [
           show "Error"
         ]
+
       ]
     ]
   ]
@@ -239,7 +250,6 @@ to speed-validate ; monitor function
     let max_excess_speed speed-limit * 0.25
 
     foreach car_list [ x ->
-      show [speed] of turtle x
       if not member? x fined and netprologo:run-query(netprologo:build-prolog-call ( word
          "snapshot(("
           "asserta(speed(?1, ?2, ?5)),"
@@ -249,6 +259,8 @@ to speed-validate ; monitor function
           "))") x ([speed] of turtle x) speed-limit max_excess_speed ticks) [
                     ; these variables are the placeholders ?1 = x, ?2 = speed of turtle x etc
         set fined lput x fined
+        ask turtle x [ set shape "turtle" ]
+        set total_violators total_violators + 1
           if not netprologo:run-query(netprologo:build-prolog-call "utils:add_violation(?1, ?2, 'speeding', ?3)" x ([shape] of turtle x) ([speed] of turtle x)) [
           show "Error"
             ]
@@ -695,7 +707,7 @@ speed-limit
 speed-limit
 1
 10
-8.0
+4.0
 1
 1
 NIL
@@ -755,7 +767,7 @@ freq-east
 freq-east
 0
 100
-0.0
+25.0
 5
 1
 %
@@ -858,7 +870,7 @@ freq-bad-cars
 freq-bad-cars
 0
 100
-100.0
+65.0
 1
 1
 NIL
@@ -904,6 +916,23 @@ freq-pedestrian
 1
 NIL
 HORIZONTAL
+
+BUTTON
+20
+45
+97
+78
+NIL
+go_until
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1374,6 +1403,48 @@ NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="default" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="100000"/>
+    <metric>total_accidents</metric>
+    <metric>total_violators</metric>
+    <enumeratedValueSet variable="max-accel">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-east">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="yellow-length">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="auto?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-human-drivers">
+      <value value="28"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-bad-cars">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="speed-limit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-pedestrian">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-north">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-brake">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="green-length">
+      <value value="25"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
