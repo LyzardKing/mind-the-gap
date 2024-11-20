@@ -16,3 +16,12 @@ The current version uses `traffic_rules.pl`.
 The rules are automatically translated (using `parse_le.pl`) from Logical English. A working version is always contained in `traffic_rules-prolog.pl`, and should not be modified manually.
 
 The glue for Netlogo is contained in `netlogo_glue.pl`, and mostly deals with data translation and logging functions.
+
+## Docker image
+
+Build an image with the dockerfile to run NetLogo.
+Can be used redirecting output to the display, or headless, by running the following command:
+
+`docker run -it --volume .:/app netlogo /opt/netlogo/netlogo-headless.sh --model /app/Traffic\ Intersection.nlogo --experiment default --table /app/output.csv`
+
+output.csv will contain the log of the simulation (default 1000 ticks), with the last two elements being the number of accidents and violations.

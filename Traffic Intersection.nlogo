@@ -1,4 +1,4 @@
-extensions[netprologo]
+extensions[netprologo vid]
 
 globals [
   ticks-at-last-change  ; value of the tick counter the last time a light changed
@@ -160,6 +160,38 @@ to add_monitor [x y dir]
     ]
     ask patch-at-heading-and-distance dir 1 [set pcolor blue]
   ]
+end
+
+;;;;;;;;;;;;;;;;;;;
+;;VIDEO RECORDING;;
+;;;;;;;;;;;;;;;;;;;
+
+to start-recorder
+  carefully [ vid:start-recorder ] [ user-message error-message ]
+  vid:reset-recorder
+end
+
+to save-recording
+  if vid:recorder-status = "inactive" [
+    user-message "The recorder is inactive. There is nothing to save."
+    stop
+  ]
+  ; prompt user for movie location
+  let path "ouptut.mp4"
+  if not is-string? path [ stop ]  ; stop if user canceled
+  ; export the movie
+  carefully [
+    vid:save-recording path
+    user-message (word "Exported movie to " path ".")
+  ] [
+    user-message error-message
+  ]
+end
+
+to go_record
+  start-recorder
+  go
+  save-recording
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -1407,7 +1439,7 @@ NetLogo 6.4.0
   <experiment name="default" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="100000"/>
+    <timeLimit steps="10000"/>
     <metric>total_accidents</metric>
     <metric>total_violators</metric>
     <enumeratedValueSet variable="max-accel">
@@ -1439,6 +1471,44 @@ NetLogo 6.4.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="max-brake">
       <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="green-length">
+      <value value="25"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="record" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go_record</go>
+    <timeLimit steps="1000"/>
+    <enumeratedValueSet variable="max-accel">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-east">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="yellow-length">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="auto?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-human-drivers">
+      <value value="28"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-bad-cars">
+      <value value="65"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="speed-limit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-pedestrian">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-brake">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freq-north">
+      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="green-length">
       <value value="25"/>

@@ -7,6 +7,7 @@
         % has_light/2,
         % is_in_the_junction/1,
         not_enter_junction_out/2,
+        must_not/2,
         behaviour/3,
         distance/3,
         speed/3,
@@ -51,10 +52,10 @@ has_neighbour(Self, Neighbour, Time) :-
 not_enter_junction_out(Self, Time) :-
     must_not(Self, 'enter the junction').
 
-# % violates(A, B) :-
-# 'traffic_rules-prolog':violates(A, B) :-
-#     violates(A, B).
-
+% violates(A, B) :-
+% 'traffic_rules-prolog':violates(A, B) :-
+%     violates(A, B).
+ 
 % Temporary glue
 'traffic_rules-prolog':is_a(A, B) :-
     is_of_type(A, B, _).
