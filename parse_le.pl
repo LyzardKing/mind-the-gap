@@ -1,6 +1,6 @@
 :- use_module(library(le_answer)).
 
-% :- initialization(main, main).
+:- initialization(main, main).
 
 main :-
     read_file_to_string('traffic_rules.le', String, []),
