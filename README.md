@@ -19,6 +19,19 @@ The glue for Netlogo is contained in `netlogo_glue.pl`, and mostly deals with da
 
 ## Docker image
 
+### Syntax
+
+Run a docker image to compile the LE code and return errors if any.
+
+Build the image via:
+`docker build -f Syntax.dockerfile -t avsyntax .`
+
+PWD is the current directory.
+
+`docker run --volume ${PWD}:/app avsyntax`
+
+### Netlogo
+
 Build an image with the dockerfile to run NetLogo.
 Can be used redirecting output to the display, or headless, by running the following command:
 
