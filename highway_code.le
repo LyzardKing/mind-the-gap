@@ -31,7 +31,8 @@ and the pedestrian _is crossing
 % You MUST stop behind the line at a junction with a ‘Stop’ sign and a solid white line across the road.
 % Wait for a safe gap in the traffic before you move off.
 a vehicle must stop behind the line at a junction
-if the vehicle sees stop sign
+if the vehicle is at the junction
+and the vehicle sees stop sign
 and the vehicle sees solid white line across the road.
 
 % Rule 172
@@ -61,19 +62,33 @@ and the vehicle sees traffic oncoming.
 % You MUST stop behind the white ‘Stop’ line across your side of the road unless the light is green.
 % If the amber light appears you may go on only if you have already crossed the stop line
 % or are so close to it that to stop might cause a collision.
-a vehicle must stop behind the line at a junction
-if the vehicle sees red light.
+% a vehicle must stop behind the line at a junction
+% if the vehicle sees red light.
 
 a vehicle can enter a junction
-if the vehicle sees amber light
+if the vehicle sees stop line
+and the vehicle sees green light.
+
+a vehicle can enter a junction
+if the vehicle sees stop line
+and the vehicle sees amber light
 and the vehicle is in the junction
     or the vehicle cannot stop safely.
 
 scenario give_way is:
 car1 is at junction1.
 car1 sees give way sign.
-car1 sees traffic oncoming.
-pedestrian1 _is crossing.
+person _is crossing.
+car2 is at junction1.
+car2 sees give way sign.
+
+scenario stop_behind_line is:
+car1 is at junction1.
+car1 sees stop sign.
+car1 sees solid white line across the road.
+
+query must_stop is:
+which vehicle must stop behind the line at which junction.
 
 query must is:
 which vehicle must which action.

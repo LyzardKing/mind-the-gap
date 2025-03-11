@@ -1,5 +1,7 @@
+:- module(scenario_runner, [run_scenario/2]).
+
 :- op(900,fx,user:not). % same as \+
-:- use_module('traffic_rules-prolog').
+:- use_module('traffic_rules-prolog', [example/2, can/2]).
 :- use_module(library(apply_macros)).
 
 % :- set_prolog_flag(unknown,warning).
@@ -17,13 +19,10 @@
 :-style_check(-singleton).
 :-style_check(-discontiguous).
 
-can(A, B) :-
-    'traffic_rules-prolog':can(A, B).
+% can(A, B) :-
+%     'traffic_rules-prolog':can(A, B).
 
-is_a(456, car).
-has_light(456, green).
-is_a(123, ambulance).
-is_approaching(123, 456).
-
-% ?- once(can(123, 'enter the junction')).
-% ?- can(456, 'enter the junction').
+run_scenario(Scenario, Query) :-
+    example(Scenario, [scenario(Facts, true)]),
+    forall(member(X, Facts), assert(X)),
+    once(can(_, Query)).

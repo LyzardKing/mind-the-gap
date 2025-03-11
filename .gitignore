@@ -10,3 +10,10 @@
 node
 pack/traffic_rules
 output.csv
+
+# Logical English packs
+logicalenglish-*.zip
+logical-english-*.vsix
+le.zip
+
+AV_Extraction*

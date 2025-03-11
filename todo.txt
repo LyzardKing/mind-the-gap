@@ -1,0 +1,7 @@
+add rules from thiago
+extend simulation to carla/sumo
+add planning with external module
+ -> reason on different longer plans.
+ -> keep in memory a list of known moves that correspond to the plan.
+
+ ? could this be a useful start for the paper?
