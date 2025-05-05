@@ -1,0 +1,20 @@
+***Starting server on port 43963 ***
+Loading net-file from 'bologna/joined/joined_buslanes.net.xml' ... done (62ms).
+Loading additional-files from 'bologna/joined/joined_bus_stops.add.xml' ... done (2ms).
+Loading additional-files from 'bologna/joined/joined_detectors.add.xml' ... done (3ms).
+Loading additional-files from 'bologna/joined/joined_vtypes.add.xml' ... done (1ms).
+Loading additional-files from 'bologna/joined/joined_tls.add.xml' ... done (2ms).
+Loading route-files incrementally from 'bologna/joined/joined.rou.xml'
+Loading route-files incrementally from 'bologna/joined/joined_busses.rou.xml'
+Loading done.
+Simulation started with time: 0.00.
+Simulation ended at time: 15.00.
+Performance:
+ Duration: 13.93s
+ TraCI-Duration: 0.08s
+ Real time factor: 1.07681
+ UPS: 38.908830
+Vehicles:
+ Inserted: 58 (Loaded: 632)
+ Running: 58
+ Waiting: 2
