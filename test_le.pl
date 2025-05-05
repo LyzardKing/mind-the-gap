@@ -1,7 +1,8 @@
 
 :- use_module(library(plunit)).
 % Re-import modules in the test environment
-:- use_module(library(le_answer)).
+% :- use_module(library(le_answer)).
+:- use_module('logicalenglish/prolog/le_answer.pl').
 :- set_test_options([silent(false), format(log)]).
 
 :- begin_tests(le).

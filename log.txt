@@ -1,0 +1,12 @@
+ERROR: /home/galileo/Documents/Projects/AVProject/parse_le.pl:5: user:main Unknown procedure: query/2
+ERROR: In:
+ERROR:   [13] query(null,_228)
+ERROR:   [12] le_answer:translate_command(user,null,null,_270,noscenario) at /home/galileo/Documents/Projects/AVProject/logicalenglish/prolog/le_answer.pl:459
+ERROR:   [11] le_answer:prepare_query(null,with(null),user,_314,_316) at /home/galileo/Documents/Projects/AVProject/logicalenglish/prolog/le_answer.pl:315
+ERROR:   [10] le_answer:answer(null,with(null),_360) at /home/galileo/Documents/Projects/AVProject/logicalenglish/prolog/le_answer.pl:218
+ERROR:    [9] le_answer:parse_and_query(highway_code,'<garbage_collected>',null,with(null),_408) at /home/galileo/Documents/Projects/AVProject/logicalenglish/prolog/le_answer.pl:937
+ERROR:    [7] catch(user:main,error(existence_error(procedure,...),context(...,_470)),'$toplevel':true) at /usr/lib/swi-prolog/boot/init.pl:565
+ERROR:    [6] catch_with_backtrace('<garbage_collected>','<garbage_collected>','<garbage_collected>') at /usr/lib/swi-prolog/boot/init.pl:645
+ERROR: 
+ERROR: Note: some frames are missing due to last-call optimization.
+ERROR: Re-run your program in debug mode (:- debug.) to get more detail.

@@ -1,4 +1,4 @@
-:-module('traffic_rules-prolog', []).
+:-module('highway_code-prolog', []).
 source_lang(en).
 local_dict([should_to, A, B, C], [agent-agent, action-action, agent-agent], [A, should, B, to, C]).
 local_dict([must_to, A, B, C], [agent-agent, action-action, agent-agent], [A, must, B, to, C]).

@@ -17,3 +17,7 @@ logical-english-*.vsix
 le.zip
 
 AV_Extraction*
+
+env/
+trash/
+marktraffic/

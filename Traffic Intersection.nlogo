@@ -530,7 +530,19 @@ to-report is-blocked? [ target-patch ] ; turtle reporter
   if in-intersection? [
     set in_intersection 1
   ]
-; Uncomment to debug if inconsistent behaviour
+
+  set prolog_command "snapshot(("
+  ; temporary tweaks
+  if other_turtles != [] [
+    set prolog_command prolog_command + "asserta(sees(?1, 'traffic oncoming'),"
+  ]
+  if light_color == [45] [
+    set prolog_command prolog_command + "asserta(sees(?1, 'amber light')),"
+  ]
+  if light_color == [55] [
+    set prolog_command prolog_command + "asserta(sees(?1, 'green light')),"
+  ]
+; Uncommen to debug if inconsistent behaviour
 ;  if (any? (signs in-radius 0.5)) [
 ;    show ([behaviour] of turtle who)
 ;    show self_distance

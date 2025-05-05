@@ -6,8 +6,8 @@
 
 main :-
     protocol('log.txt'),
-    read_file_to_string('traffic_rules_llama.le', String, []),
-    parse_and_query('traffic_rules_llama', en(String), null, with(null), _).
+    read_file_to_string('highway_code.le', String, []),
+    parse_and_query('highway_code', en(String), null, with(null), _).
     % run_scenario(obligation, stop).
 
 % % run_scenarios
