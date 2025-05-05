@@ -1,0 +1,18 @@
+Loading net-file from 'bologna/acosta/acosta_buslanes.net.xml' ... done (20ms).
+Loading additional-files from 'bologna/acosta/acosta_vtypes.add.xml' ... done (1ms).
+Loading additional-files from 'bologna/acosta/acosta_detectors.add.xml' ... done (1ms).
+Loading additional-files from 'bologna/acosta/acosta_tls.add.xml' ... done (1ms).
+Loading route-files incrementally from 'bologna/acosta/acosta.rou.xml'
+Loading done.
+Simulation started with time: 0.00.
+Warning: Vehicle 'Togliatti_9_21' performs emergency stop at the end of lane '72[0]_0' because there is no connection to the next edge (decel=-4.61, offset=0.00), time=138.00.
+Simulation ended at time: 166.00.
+Performance:
+ Duration: 17.48s
+ Real time factor: 9.49711
+ UPS: 1734.595801
+Vehicles:
+ Inserted: 379 (Loaded: 487)
+ Running: 345
+ Waiting: 15
+ Emergency Stops: 1

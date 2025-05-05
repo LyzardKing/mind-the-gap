@@ -21,3 +21,6 @@ AV_Extraction*
 env/
 trash/
 marktraffic/
+
+.env/
+.venv/
