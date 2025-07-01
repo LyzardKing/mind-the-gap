@@ -2,6 +2,7 @@
 *.pl~
 *.swp
 *.bak
+.env
 
 # Ignore the runtime files
 **/violations.pl
