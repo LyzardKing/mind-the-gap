@@ -37,4 +37,4 @@ Can be used redirecting output to the display, or headless, by running the follo
 
 `docker run -it --volume .:/app netlogo /opt/netlogo/netlogo-headless.sh --model /app/Traffic\ Intersection.nlogo --experiment default --table /app/output.csv`
 
-output.csv will contain the log of the simulation (default 1000 ticks), with the last two elements being the number of accidents and violations.
+`output.csv` will contain the log of the simulation (default 1000 ticks), with the last two elements being the number of accidents and violations.
