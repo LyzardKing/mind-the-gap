@@ -3,34 +3,60 @@ import janus_swi as janus
 import json
 import sys
 
-nolog = False
-if len(sys.argv) < 2:
-    print("Usage: python test/test.py <le_file> <log_file>")
-    sys.exit(1)
-if len(sys.argv) != 3:
-    nolog = True
+"""LE Test Module
+This module provides functions to test Logical English (LE) files against a knowledge base and scenarios.
+If no log file is provided, it will only check the LE file.
+
+To run the tests via the cli, use the following command:
+
+python -m le_utils.test <le_file> (<log_file>)
+
+To run the tests programmatically, you can use the `scenario_test` function with the LE file and the log file:
+
+from le_utils.test import scenario_test, load_files
+le_src, content = load_files("path/to/le_file.le", "path/to/log_file.log or None")
+result = scenario_test(le_src=le_src, content=content)
+"""
 
 templates_regex = r"the templates are:\n(.+)\nthe knowledge base"
 kb_regex = r"the knowledge base.+?\n(.+?)scenario .+? is"
-scenario_regex = r"Scenario:\*\*\n```le\n(scenario (.+?) [^`]+)```\n.+?Query:\*\*\n```le\n(query (.+?) [^`]+)```\n.+?Results:\*\*\n```le\n([^`]+)```"
+# scenario_regex = r"Scenario:\*\*\n```le\n(scenario (.+?) [^`]+)```\n.+?Query:\*\*\n```le\n(query (.+?) [^`]+)```\n.+?Results:\*\*\n```le\n([^`]+)```"
+scenario_regex = r"Templates created:\*\* ?(\n```le\n(.+? [^`]+)```|None)\n.+?Scenario:\*\*\n```le\n(scenario (.+?) [^`]+)```\n.+?Query:\*\*\n```le\n(query (.+?) [^`]+)```\n.+?Results:\*\*\n```le\n([^`]+)```"
 
 builtin_templates = [
     ".+ is .+"
 ]
 
-# Load the log file and the LE source file
-kb_file = sys.argv[1]
+le_src, content = None, None
 
-if not nolog:
-    log_file = sys.argv[2]
+# Load the LE source file and the log file
+def load_files_argv():
+    # Load the log file and the LE source file
+    kb_file = sys.argv[1]
 
-    with open(log_file, "r") as file:
-        content = file.read()
+    if len(sys.argv) == 3:
+        log_file = sys.argv[2]
 
-with open(kb_file, "r") as file:
-    le_src = file.read()
+        with open(log_file, "r") as file:
+            content = file.read()
+    else:
+        content = None
 
-def scenario_test(le_src=le_src):
+    with open(kb_file, "r") as file:
+        le_src = file.read()
+    return le_src, content
+
+def load_files(kb_file, log_file=None):
+    if log_file:
+        with open(log_file, "r") as file:
+            content = file.read()
+    else:
+        content = None
+    with open(kb_file, "r") as file:
+        le_src = file.read()
+    return le_src, content
+
+def scenario_test(le_src=le_src, content=None):
     output = {
         "status": "success",
         "message": "",
@@ -40,10 +66,14 @@ def scenario_test(le_src=le_src):
         }
     }
 
-    if not nolog:
+    if content:
         matches = re.findall(scenario_regex, content, re.DOTALL)
         match = matches[0]
-        scenario, scenario_id, query, query_id, results = match
+        templates_parse, templates, scenario, scenario_id, query, query_id, _ = match
+
+        if templates_parse:
+            # print("Templates found in log file, parsing...")
+            le_src = le_src.replace("the knowledge base", templates + "\n\nthe knowledge base")
 
         # print("Testing new scenario and query...")
         le_src += f"""
@@ -75,7 +105,7 @@ def scenario_test(le_src=le_src):
             "kb": kb_errors,
             "scenario": scenario_errors
         }
-    elif not nolog:
+    elif content:
         # print("No errors found in LE lines or scenario lines. Proceeding with query...")
         # add_templates(le_src, )
         # print(le_src)
@@ -149,4 +179,13 @@ def check_scenario(le_src, scenario):
             errors.append(f"No template found for: {i}")
     return errors
 
-print(scenario_test(le_src=le_src))
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python test/test.py <le_file> <log_file>")
+        sys.exit(1)
+    le_src, content = load_files_argv()
+    print(scenario_test(le_src=le_src, content=content))
+
+def test_scenario():
+    le_src, content = load_files("highway_code.le")
+    print(scenario_test(le_src=le_src, content=content))
