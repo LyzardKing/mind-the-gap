@@ -22,6 +22,7 @@ if the vehicle should the action to an agent.
 % Rule 170
 % [...] give way to pedestrians crossing or waiting to cross a road into which or from which you are turning.
 % If they have started to cross they have priority, so give way (see Rule H2)
+% LLM
 a vehicle should give way to a pedestrian
 if the vehicle is at a junction
 and the pedestrian _is crossing

@@ -1,0 +1,14 @@
+Loading net-file from 'swansea/swansea.net.xml' ... done (470ms).
+Loading additional-files from 'swansea/vtypes.add.xml' ... done (1ms).
+Loading route-files incrementally from 'swansea/routes.rou.xml'
+Loading done.
+Simulation started with time: 0.00.
+Simulation ended at time: 93.00.
+Performance:
+ Duration: 1834.26s
+ Real time factor: 0.0507016
+ UPS: 2.193797
+Vehicles:
+ Inserted: 87 (Loaded: 192)
+ Running: 82
+ Waiting: 0
