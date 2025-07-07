@@ -77,6 +77,7 @@ The output for this step should be like:
 Now let's go back to the step-by-step:
 
 5. *Build the rules* using the identified templates.
+
 - Connect the rules and conditions using the templates and logical connections from Logical English.
 - If the subject is "you", replace the agent in the templates with the constant *vehicle*.
 - The ouput will be a single `le` code space delimited by triple ticks. 
@@ -161,7 +162,9 @@ In this step, you must craft the final Logical English code with all templates (
 ```le
 the templates are:
 
+% --------------
 % Existing Templates
+% --------------
 *an agent* should *an action*.
 *an agent* must *an action*.
 *an agent* can *an action*.
@@ -178,10 +181,16 @@ the templates are:
 *a thing* is *a thing*
 *a thing* exists in *a thing*
 
+% --------------
 % New templates
 % [If you proposed a new template, put it here. Otherwise, leave empty.]
+% --------------
 
 the knowledge base example includes:
+
+% --------------
+% New Rules
+% --------------
 
 % 1. You MUST stop behind the line at a junction with a 'Stop' sign and a solid white line across the road.
 vehicle must stop behind the line at a junction
@@ -206,7 +215,8 @@ In the following section, we will explain the details on Logical English syntax.
 
 - **Purpose:** Declare a fixed predicate with variable arguments.
 - **Structure:** Use simple or compound verbs and noun phrases.
-- **Example:** `a person P is a British citizen if ...`
+- **Example:** `a person P is a British citizen`
+- **Conciseness:** Templates must be concise. If a phrase is complex, it should be broken down into many templates.
 
 #### Variables
 
@@ -218,11 +228,11 @@ In the following section, we will explain the details on Logical English syntax.
 #### Logical Constructs
 
 - **AND:** Used to combine multiple conditions that must all be true.
-- **Example:** `condition1 and condition2`
+    **Example:** `condition1 and condition2`
 - **OR:** Used to combine conditions where at least one must be true.
-- **Example:** `condition1 or condition2`
-- **NOT:** Used to negate a condition.
-- **Example:** `not condition`
+    **Example:** `condition1 or condition2`
+- **It is not the case that:** Used to negate a condition.
+    **Example:** `it is not the case that condition`
 
 ---
 
@@ -249,9 +259,9 @@ a person acquires british citizenship on a date
 if the person is born in the uk on the date
 and the date is after commencement
 and an other person is the mother of the person
-or the other person is the father of the person
+    or the other person is the father of the person
 and the other person is a british citizen on the date
-or the other person is settled in the uk on the date.
+    or the other person is settled in the uk on the date.
 ```
 
 #### ISDA Master Agreement
@@ -335,14 +345,16 @@ that the borrower pays the amount to the lender on D1
 and D is the latest of D1 and D2.
 ```
 
-
 ## Final Remarks
 
-You task is to transform natural language text into Logical English.
-To do so, follow the Cheatsheet guide on how to write Logical English, to fulfill the following steps:
+Your task is to transform natural language text into Logical English.
+To do so, follow the step by step presented before. To write Logical English follow the cheatsheet
+Fulfill the following steps:
 
 1. Break the input into sentences.
 2. For each sentence do the following relevant information:
 3. Present the JSON with the extracted elements for each sentence.
 4. For each JSON object with conclusion and conditions, identify the templates.
-5. Build the rules using the templates.
+5. Present the final LE code using the templates and rules. 
+    - Split new templates from old templates using a comment "% New templates"
+    - Split new rules from old rules using a comment "% New rules"
