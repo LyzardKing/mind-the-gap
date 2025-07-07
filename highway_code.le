@@ -1,5 +1,6 @@
 the target language is: prolog.
 
+% Templates
 the templates are:
 *an agent* should *an action*.
 *an agent* must *an action*.
@@ -12,8 +13,10 @@ the templates are:
 *an agent* _is *a place*.
 *an agent* cannot *an action*.
 
+% Knowledge Base
 the knowledge base highway_code includes:
 
+% LLM
 a vehicle must an action
 if the vehicle must the action to an agent.
 a vehicle should an action
@@ -31,6 +34,7 @@ and the pedestrian _is crossing
 % Rule 171
 % You MUST stop behind the line at a junction with a ‘Stop’ sign and a solid white line across the road.
 % Wait for a safe gap in the traffic before you move off.
+% LLM
 a vehicle must stop behind the line at a junction
 if the vehicle is at the junction
 and the vehicle sees stop sign
@@ -39,6 +43,7 @@ and the vehicle sees solid white line across the road.
 % Rule 172
 % The approach to a junction may have a ‘Give Way’ sign or a triangle marked on the road.
 % You MUST give way to traffic on the main road when emerging from a junction with broken white lines across the road.
+% LLM
 a vehicle must give way to traffic
 if the vehicle sees give way sign
     or the vehicle sees triangle marked on the road
@@ -65,16 +70,22 @@ and the vehicle sees traffic oncoming.
 % or are so close to it that to stop might cause a collision.
 % a vehicle must stop behind the line at a junction
 % if the vehicle sees red light.
-
+% -
+% Rule 175 Part I
+% LLM
 a vehicle can enter a junction
 if the vehicle sees stop line
 and the vehicle sees green light.
 
+% Rule 175 Part II
+% LLM
 a vehicle can enter a junction
 if the vehicle sees stop line
 and the vehicle sees amber light
 and the vehicle is in the junction
     or the vehicle cannot stop safely.
+
+% LLM_Finish
 
 scenario give_way is:
 car1 is at junction1.
