@@ -1,85 +1,70 @@
 # Prompt: Transform Legal Text into Logical English (LE)
 
-## Objective
 
-Convert the provided legal text into Logical English (LE) following the step by step below.
+## Objective
+Convert the provided legal text into Logical English (LE) for clarity and precision.
 
 
 ## Step by Step
 
 1. Split the paragraph into sentences.
 2. For each sentence do the following relevant information:
-    - Subject: Entity (vehicle, person, etc.) that performs the action described in the conclusion.
-    - Conclusion: The action that is present in the main sentence.
-    - Deontic Modality: Optional. The importance of the action indicated in the conclusion. Either, should or must.
-    - Conditions: Things that have to be true, in order to the conclusion to be applicable.
+- Subject: Entity (vehicle, person, etc.) that performs the action described in the conclusion.
+- Conclusion: The action that is present in the main sentence.
+- Deontic Modality: Optional. The importance of the action indicated in the conclusion. Either, should or must.
+- Conditions: Things that have to be true, in order to the conclusion to be applicable.
 3. Present the JSON with the extracted elements for each sentence.
 4. For each JSON object with conclusion and conditions, *identify the templates*.
 
-**Conclusion**
-Follow bellow some details on how to extract the conclusions.
+- **Conclusion**:
+* Predicate name is the deontic modality if it exists. If not assume "can".
+* Arguments are the subject, action and specifications (if they exist). A specification can be a location, a time, a characteristic.
 
-- *Predicate name* is the deontic modality if it exists (must, should, etc.). If not assume "can".
-- Arguments are the subject, action and specifications (if they exist). A specification can be a location, a time, a characteristic.
-
-- You should explicitly choose *one* of the following templates to write the conclusion.
+* You should explicitly choose *one* of the following templates to write the conclusion.
 
 ```le
-the templates are:
-*an agent* should *an action*.
-*an agent* must *an action*.
-*an agent* can *an action*.
-*an agent* must *an action* to *an agent*.
-*an agent* must *an action* at *a location*.
-*an agent* should *an action* to *an agent*.
-*an agent* sees *an item*.
-*an agent* is at *a place*.
-*an agent* is in *a place*.
-*an agent* _is *a place*.
-*an agent* cannot *an action*.
+templates:
+*a subject* must *an action*.
+*a subject* must *an action* at *a location*.
+*a subject* must not *an action*.
+*a subject* must not *an action* at *a location*.
+*a subject* can *an action*.
+*a subject* can *an action* at *a location*.
 ```
 
-- Only create a new template, if and only if, the existing templates *do not fit*.
-- Present the conclusion together with the corresponding template. For example:
-    * "you must stop behind the line at a junction": *an agent* must *an action* at *a location*.
+* Only create a new template, if and only if, the existing templates *do not fit*.
+* present the conclusion together with the corresponding template. For example:
+- "you must stop behind the line at a junction": *a subject* must *an action* at *a location*.
 
-**Conditions**
-
-Follow bellow some details on how to extract the conditions.
-
-- Find the subject, the verb, and the specification.
-- Use the verb as the predicate name.
-- The arguments are the subject and specifications.
-- You should explicitly choose *one* of the following templates to write the conditions.
+- **Conditions**
+* Find the subject, the verb, and the specification.
+* Use the verb as the predicate name.
+* The arguments are the subject and specifications.
+* You should explicitly choose *one* of the following templates to write the conditions.
 
 ```le
-the templates are
+templates:
 
-*a thing* has *a thing*
-*a thing* is *a thing*
+*a thing* has *a property/object*
+*a thing* is *a property/object*
 *a thing* exists in *a thing*
 ```
 
-- Only create a new template, if and only if, the existing templates *do not fit*.
-- For each condition, present it together with the corresponding template. 
+* Only create a new template, if and only if, the existing templates *do not fit*.
+* For each condition, present it together with the corresponding template. For example:
+- "The junction has stop sign": *a thing* has *a property*.
+* The output for this step should be like:
+- **Conditions:**
+- "Condition 1": `Associated template`
+- "Condition 2": `Another associated template`
+- ...
+- **Conclusion:**
+- "Conclusion": `Associated template`
 
-For example:
-"The junction has stop sign": *a thing* has *a property*.
-    
-The output for this step should be like:
-**Conditions:**
-    - "Condition 1": `Associated template`
-    - "Condition 2": `Another associated template`
-    - ...
-**Conclusion:**
-    - "Conclusion": `Associated template`
-
-Now let's go back to the step-by-step:
 
 5. *Build the rules* using the identified templates.
 - Connect the rules and conditions using the templates and logical connections from Logical English.
-- If the subject is "you", replace the agent in the templates with the constant *vehicle*.
-- The ouput will be a single `le` code space delimited by triple ticks. 
+- If the subject is "you", replace the agent in the templates with the constant ego.
 
 ## Few Shot examples
 
@@ -96,43 +81,43 @@ Now let's go back to the step-by-step:
 
 1. You MUST stop behind the line at a junction with a 'Stop' sign and a solid white line across the road.
 
-- Subject: "vehicle"
+- Subject: "ego"
 - Conclusion: "stop behind the line at a junction"
 - Deontic modality: "must"
 - Conditions:
-    * "the junction has a 'Stop' sign"
-    * "the junction has a solid white line across the road"
+* "the junction has a 'Stop' sign"
+* "the junction has a solid white line across the road"
 
 2. Wait for a safe gap in the traffic before you move off.
 
-- Subject: "vehicle"
+- Subject: "ego"
 - Conclusion: "move off"
 - Deontic modality: None
 - Conditions:
-    * "there is a safe gap in the traffic"
+* "there is a safe gap in the traffic"
 
 
 **Step 3: Present the JSON**
 
 ```json
 [
-    {
-        "subject":"ego",
-        "conclusion":"stop behind the line at a junction",
-        "deontic_modality":"must",
-        "conditions":[
-            "the junction has a 'Stop' sign",
-            "the junction has a solid white line across the road"
-        ]
-    },
-    {
-        "subject":"ego",
-        "conclusion":"move off",
-        "deontic_modality":null,
-        "conditions":[
-            "there is a safe gap in the traffic"
-        ]
-    }
+{
+"subject":"ego",
+"conclusion":"stop behind the line at a junction",
+"deontic_modality":"must",
+"conditions":[
+"the junction has a 'Stop' sign",
+"the junction has a solid white line across the road"
+]
+},
+{
+"subject":"ego",
+"conclusion":"move off",
+"deontic_modality":null,
+"conditions":[
+"there is a safe gap in the traffic"
+]
+}
 ]
 ```
 
@@ -141,61 +126,40 @@ Now let's go back to the step-by-step:
 1. You MUST stop behind the line at a junction with a 'Stop' sign and a solid white line across the road.
 
 **Conclusion**
-    - "You MUST stop behind the line at a junction": `*an agent* must *an action* at *a location*`
-
+- "You MUST stop behind the line at a junction": `*an agent* must *an action* at *a location*`
 **Conditions:**
-    - "with a 'Stop' sign": `*a thing* has *a thing*`
-    - "a solid white line across the road": `*a thing* has *a thing*`
+- "with a 'Stop' sign": `*a thing* has *a thing*`
+- "a solid white line across the road": `*a thing* has *a thing*`
+
 
 2. Wait for a safe gap in the traffic before you move off.
 
 **Conclusion**
-    - "you move off": `*an agent* can *an action*`
+- "you move off": `*an agent* can *an action*`
 **Conditions**
-    - "there is a safe gap in the traffic": `*a thing* exists in *a location*`
+- "there is a safe gap in the traffic": `*a thing* exists in *a location*`
 
-**Step 5: Build the final LE**
+**Step 5: Build the rules**
 
-In this step, you must craft the final Logical English code with all templates (existing or newly proposed ones) and knowledge base with the extracted rule(s).
+1. You MUST stop behind the line at a junction with a 'Stop' sign and a solid white line across the road.
 
 ```le
-the templates are:
-
-% Existing Templates
-*an agent* should *an action*.
-*an agent* must *an action*.
-*an agent* can *an action*.
-*an agent* must *an action* to *an agent*.
-*an agent* must *an action* at *a location*.
-*an agent* should *an action* to *an agent*.
-*an agent* sees *an item*.
-*an agent* is at *a place*.
-*an agent* is in *a place*.
-*an agent* _is *a place*.
-*an agent* cannot *an action*.
-
-*a thing* has *a thing*
-*a thing* is *a thing*
-*a thing* exists in *a thing*
-
-% New templates
-% [If you proposed a new template, put it here. Otherwise, leave empty.]
-
 the knowledge base example includes:
-
-% 1. You MUST stop behind the line at a junction with a 'Stop' sign and a solid white line across the road.
-vehicle must stop behind the line at a junction
+ego must stop behind the line at a junction
 if the junction has stop sign
 and the junction has solid white line across the road.
+```
 
-% 2. Wait for a safe gap in the traffic before you move off. 
-vehicle can move off
+2. Wait for a safe gap in the traffic before you move off.
+
+```
+the knowledge base example includes:
+ego can move off
 if safe gap exists in traffic.
 ```
 
 ## Logical English Instructions:
 
-In the following section, we will explain the details on Logical English syntax.
 
 #### Basic Form
 
