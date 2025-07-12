@@ -5,13 +5,29 @@ the templates are:
 *an agent* should *an action*.
 *an agent* must *an action*.
 *an agent* can *an action*.
+*an agent* can *an action* at *a location*.
 *an agent* must *an action* to *an agent*.
+*an agent* must not *an action*.
+*an agent* must not *an action* to *an agent*.
+*an agent* must not *an action* at *a location*.
 *an agent* should *an action* to *an agent*.
+*an agent* should not *an action*.
+*an agent* should not *an action* to *an agent*.
+
+*an agent* must *an action* at *a location*.
+*an agent* must not *an action*.
+*an agent* must not *an action* at *a location*.
+
+*an agent* intends to *an action*.
+
 *an agent* sees *an item*.
 *an agent* is at *a place*.
 *an agent* is in *a place*.
 *an agent* _is *a place*.
 *an agent* cannot *an action*.
+*a thing* has *a thing*
+*a thing* is *a thing*
+*a thing* exists in *a thing*
 
 % Knowledge Base
 the knowledge base highway_code includes:
